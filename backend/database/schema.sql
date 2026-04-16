@@ -176,6 +176,16 @@ CREATE TABLE IF NOT EXISTS feedbacks (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- TIÊU CHÍ GHI NHẬN (Star Criteria for Kudo box)
+CREATE TABLE IF NOT EXISTS star_criteria (
+    id SERIAL PRIMARY KEY,
+    company_id INT NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL,
+    category VARCHAR(255) NOT NULL DEFAULT 'culture', -- culture, objective, project, task
+    stars INT NOT NULL DEFAULT 1,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS kudos (
     id SERIAL PRIMARY KEY,
     company_id INT NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
@@ -185,16 +195,6 @@ CREATE TABLE IF NOT EXISTS kudos (
     stars_attached INT DEFAULT 0,
     criteria_id INT REFERENCES star_criteria(id) ON DELETE SET NULL,
     reference_text VARCHAR(255),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
--- TIÊU CHÍ GHI NHẬN (Star Criteria for Kudo box)
-CREATE TABLE IF NOT EXISTS star_criteria (
-    id SERIAL PRIMARY KEY,
-    company_id INT NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-    name VARCHAR(255) NOT NULL,
-    category VARCHAR(255) NOT NULL DEFAULT 'culture', -- culture, objective, project, task
-    stars INT NOT NULL DEFAULT 1,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
