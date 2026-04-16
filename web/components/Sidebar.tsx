@@ -65,7 +65,7 @@ export default function Sidebar() {
     router.push(`/${slug}/dashboard`);
   };
 
-  const isAdmin = activeWorkspace?.role === "admin";
+  const isAdmin = activeWorkspace?.role === "admin" || activeWorkspace?.role === "manager";
 
   const navItems = [
     { name: "Tổng quan", href: `/${currentSlug}/dashboard`, icon: LayoutDashboard },
@@ -99,7 +99,7 @@ export default function Sidebar() {
                 {activeWorkspace?.name || "Đang tải..."}
               </span>
               <span className="text-[12px] text-[#5A6E85] font-medium capitalize">
-                {activeWorkspace?.role || "Gói miễn phí"} {activeWorkspace?.role === "admin" && "• Quản trị"}
+                {activeWorkspace?.role || "Gói miễn phí"} {(activeWorkspace?.role === "admin" || activeWorkspace?.role === "manager") && "• Quản trị"}
               </span>
             </div>
             <ChevronDown className="w-5 h-5 text-[#9CA3AF] flex-shrink-0" />

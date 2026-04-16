@@ -36,7 +36,7 @@ func GetGifts(c *gin.Context) {
 
 	var role string
 	_ = database.Pool.QueryRow(ctx, "SELECT role FROM company_users WHERE company_id = $1 AND user_id = $2", companyID, userID).Scan(&role)
-	isManager := (role == "owner" || role == "admin")
+	isManager := (role == "owner" || role == "admin" || role == "manager")
 
 	query := `
 		SELECT id, name, description, image_url, star_price, category, is_active, created_at
