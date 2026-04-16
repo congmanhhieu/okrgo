@@ -559,8 +559,8 @@ export default function GiftsAdminPage() {
                         try {
                           const fd = new FormData();
                           fd.append("image", file);
-                          const res = await api.post(`/workspaces/${companySlug}/gifts/upload`, fd, { headers: { "Content-Type": "multipart/form-data" } });
-                          setFormGiftImage(res.data.url);
+                          const res = await api.postForm(`/workspaces/${companySlug}/gifts/upload`, fd);
+                          setFormGiftImage(res.url);
                           toast.success("Đã tải ảnh lên");
                         } catch (err: any) { toast.error("Tải ảnh thất bại"); }
                         finally { setIsUploading(false); e.target.value = ''; }
