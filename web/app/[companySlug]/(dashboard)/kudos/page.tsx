@@ -6,6 +6,7 @@ import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { Plus, Award, Star, Trophy, Users, Heart } from "lucide-react";
 import { KudoFormModal } from "./KudoFormModal";
+import { getImageUrl } from "@/lib/image";
 
 type KudoItem = {
   id: number;
@@ -16,6 +17,8 @@ type KudoItem = {
   criteria_name?: string;
   criteria_category?: string;
   reference_text?: string;
+  sender_avatar?: string;
+  receiver_avatar?: string;
   created_at: string;
 };
 
@@ -24,6 +27,7 @@ type LeaderboardItem = {
   user_name: string;
   total_kudos: number;
   total_stars: number;
+  user_avatar?: string;
 };
 
 export default function KudosPage() {
@@ -112,9 +116,13 @@ export default function KudosPage() {
               kudos.map((k) => (
                 <div key={k.id} className="bg-white rounded-[16px] border border-[#E2E8F0] p-5 shadow-sm hover:shadow-md transition-shadow">
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#00b24e] to-[#34D399] flex items-center justify-center text-white font-bold text-[16px] shadow-inner shrink-0">
-                      {k.receiver_name[0]?.toUpperCase()}
-                    </div>
+                    {k.sender_avatar ? (
+                      <img src={getImageUrl(k.sender_avatar)} alt={k.sender_name} className="w-10 h-10 rounded-full object-cover shadow-sm shrink-0" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#00b24e] to-[#34D399] flex items-center justify-center text-white font-bold text-[16px] shadow-inner shrink-0 leading-none">
+                        {k.sender_name[0]?.toUpperCase()}
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-4">
                         <div className="text-[15px]">
@@ -177,9 +185,18 @@ export default function KudosPage() {
                     <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[12px] font-bold ${idx === 0 ? 'bg-yellow-100 text-yellow-600' : idx === 1 ? 'bg-gray-100 text-gray-500' : idx === 2 ? 'bg-orange-100 text-orange-600' : 'text-[#9CA3AF]'}`}>
                       #{idx + 1}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[14px] font-semibold text-[#1E2A3A] truncate">{u.user_name}</div>
-                      <div className="text-[12px] text-[#5A6E85]">{u.total_kudos} lượt ghi nhận</div>
+                    <div className="flex-1 min-w-0 flex items-center gap-2">
+                      {u.user_avatar ? (
+                        <img src={getImageUrl(u.user_avatar)} alt={u.user_name} className="w-8 h-8 rounded-full object-cover shrink-0" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-[#E2E8F0] flex items-center justify-center text-[#5A6E85] font-bold text-[13px] shrink-0 leading-none">
+                          {u.user_name[0]?.toUpperCase()}
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[14px] font-semibold text-[#1E2A3A] truncate">{u.user_name}</div>
+                        <div className="text-[12px] text-[#5A6E85]">{u.total_kudos} lượt ghi nhận</div>
+                      </div>
                     </div>
                     <div className="text-right shrink-0">
                       <div className="flex items-center text-[13px] font-bold text-[#F59E0B]">

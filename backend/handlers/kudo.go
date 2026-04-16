@@ -37,6 +37,7 @@ func GetKudos(c *gin.Context) {
 			k.id, k.company_id, k.sender_id, k.receiver_id, k.content, 
 			k.stars_attached, k.criteria_id, k.reference_text, k.created_at,
 			s.name as sender_name, r.name as receiver_name,
+			s.avatar_url as sender_avatar, r.avatar_url as receiver_avatar,
 			sc.name as criteria_name, sc.category as criteria_category
 		FROM kudos k
 		JOIN users s ON k.sender_id = s.id
@@ -97,13 +98,14 @@ func GetKudosLeaderboard(c *gin.Context) {
 		SELECT 
 			u.id as user_id, 
 			u.name as user_name,
+			u.avatar_url as user_avatar,
 			COUNT(k.id) as total_kudos, 
 			SUM(COALESCE(k.stars_attached, 0)) as total_stars
 		FROM kudos k
 		JOIN users u ON k.receiver_id = u.id
 		WHERE k.company_id = $1 
 		  AND date_trunc('month', k.created_at) = date_trunc('month', CURRENT_DATE)
-		GROUP BY u.id, u.name
+		GROUP BY u.id, u.name, u.avatar_url
 		ORDER BY total_kudos DESC, total_stars DESC
 		LIMIT 10
 	`

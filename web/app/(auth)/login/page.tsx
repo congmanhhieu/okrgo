@@ -10,7 +10,7 @@ export default function LoginPage() {
 
   // Tabs: 'login' | 'register' | 'forgot'
   const [activeTab, setActiveTab] = useState<"login" | "register" | "forgot">("login");
-  
+
   // Loading & Error States
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -53,7 +53,7 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    
+
     setIsLoading(true);
     try {
       const endpoint = activeTab === "login" ? "/auth/login" : "/auth/register";
@@ -68,7 +68,7 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-      
+
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error || "Có lỗi xảy ra, vui lòng thử lại.");
@@ -80,7 +80,7 @@ export default function LoginPage() {
         setIsLoading(false);
         return;
       }
-      
+
       toast.success("Đăng nhập thành công!");
       localStorage.setItem("okrgo_token", data.token);
 
@@ -88,18 +88,18 @@ export default function LoginPage() {
       const wsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/workspaces`, {
         headers: { "Authorization": `Bearer ${data.token}` }
       });
-      
+
       if (wsRes.ok) {
         const workspaces = await wsRes.json();
         if (workspaces && workspaces.length > 0) {
-          router.push(`/${workspaces[0].slug}/departments`);
+          router.push(`/${workspaces[0].slug}/dashboard`);
         } else {
           router.push("/onboarding");
         }
       } else {
         router.push("/onboarding");
       }
-      
+
     } catch (err: any) {
       toast.error(err.message);
     } finally {
@@ -114,7 +114,7 @@ export default function LoginPage() {
       toast.error("Vui lòng nhập Email để đặt lại mật khẩu.");
       return;
     }
-    
+
     setIsLoading(true);
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/forgot-password`, {
@@ -122,7 +122,7 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email })
       });
-      
+
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error || "Gửi yêu cầu thất bại.");
@@ -146,23 +146,21 @@ export default function LoginPage() {
 
         <div className="flex flex-col space-y-6">
           <div className="flex border-b border-[#E2E8F0]">
-            <button 
+            <button
               onClick={() => setActiveTab("login")}
-              className={`flex-1 text-center py-3 text-[14px] font-medium transition-colors ${
-                activeTab === "login" || activeTab === "forgot"
-                  ? "text-[#00b24e] border-b-2 border-[#00b24e]" 
+              className={`flex-1 text-center py-3 text-[14px] font-medium transition-colors ${activeTab === "login" || activeTab === "forgot"
+                  ? "text-[#00b24e] border-b-2 border-[#00b24e]"
                   : "text-[#5A6E85] hover:text-[#1E2A3A] hover:bg-[#F9FBFD] rounded-t-[10px]"
-              }`}
+                }`}
             >
               Đăng nhập
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab("register")}
-              className={`flex-1 text-center py-3 text-[14px] font-medium transition-colors ${
-                activeTab === "register" 
-                  ? "text-[#00b24e] border-b-2 border-[#00b24e]" 
+              className={`flex-1 text-center py-3 text-[14px] font-medium transition-colors ${activeTab === "register"
+                  ? "text-[#00b24e] border-b-2 border-[#00b24e]"
                   : "text-[#5A6E85] hover:text-[#1E2A3A] hover:bg-[#F9FBFD] rounded-t-[10px]"
-              }`}
+                }`}
             >
               Đăng ký
             </button>
@@ -195,11 +193,11 @@ export default function LoginPage() {
               </div>
               <div className="flex items-center justify-between text-[12px] text-[#5A6E85]">
                 <label className="flex items-center space-x-2 cursor-pointer group">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="accent-[#00b24e] w-4 h-4 rounded border-[#E2E8F0] cursor-pointer group-hover:ring-2 ring-[#00b24e]/20 transition-all" 
+                    className="accent-[#00b24e] w-4 h-4 rounded border-[#E2E8F0] cursor-pointer group-hover:ring-2 ring-[#00b24e]/20 transition-all"
                   />
                   <span className="group-hover:text-[#1E2A3A] transition-colors">Ghi nhớ đăng nhập</span>
                 </label>
@@ -207,8 +205,8 @@ export default function LoginPage() {
                   Quên mật khẩu?
                 </button>
               </div>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={isLoading}
                 className={`w-full text-white mt-2 py-2.5 rounded-[10px] font-medium text-[14px] transition-colors ${isLoading ? 'bg-[#9CA3AF] cursor-not-allowed' : 'bg-[#00b24e] hover:bg-[#009440]'}`}
               >
@@ -231,32 +229,32 @@ export default function LoginPage() {
                   placeholder="Nguyễn Văn A"
                 />
               </div>
-              
+
               <div className="flex flex-col sm:flex-row gap-4">
-                 <div className="flex-1 flex flex-col space-y-1.5">
-                    <label className="text-[14px] font-medium text-[#1E2A3A]">Email</label>
-                    <input
-                      type="email"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full border border-[#E2E8F0] rounded-[10px] outline-none focus:border-[#00b24e] transition-colors py-2.5 px-3 text-[#1E2A3A] text-[14px] placeholder-[#9CA3AF] focus:ring-1 focus:ring-[#00b24e]/10"
-                      placeholder="you@email.com"
-                    />
-                 </div>
-                 <div className="flex-1 flex flex-col space-y-1.5">
-                    <label className="text-[14px] font-medium text-[#1E2A3A]">Số điện thoại</label>
-                    <input
-                      type="tel"
-                      required
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="w-full border border-[#E2E8F0] rounded-[10px] outline-none focus:border-[#00b24e] transition-colors py-2.5 px-3 text-[#1E2A3A] text-[14px] placeholder-[#9CA3AF] focus:ring-1 focus:ring-[#00b24e]/10"
-                      placeholder="0912 345 678"
-                    />
-                 </div>
+                <div className="flex-1 flex flex-col space-y-1.5">
+                  <label className="text-[14px] font-medium text-[#1E2A3A]">Email</label>
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full border border-[#E2E8F0] rounded-[10px] outline-none focus:border-[#00b24e] transition-colors py-2.5 px-3 text-[#1E2A3A] text-[14px] placeholder-[#9CA3AF] focus:ring-1 focus:ring-[#00b24e]/10"
+                    placeholder="you@email.com"
+                  />
+                </div>
+                <div className="flex-1 flex flex-col space-y-1.5">
+                  <label className="text-[14px] font-medium text-[#1E2A3A]">Số điện thoại</label>
+                  <input
+                    type="tel"
+                    required
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full border border-[#E2E8F0] rounded-[10px] outline-none focus:border-[#00b24e] transition-colors py-2.5 px-3 text-[#1E2A3A] text-[14px] placeholder-[#9CA3AF] focus:ring-1 focus:ring-[#00b24e]/10"
+                    placeholder="0912 345 678"
+                  />
+                </div>
               </div>
-              
+
               <div className="flex flex-col space-y-1.5">
                 <label className="text-[14px] font-medium text-[#1E2A3A]">Mật khẩu</label>
                 <input
@@ -268,7 +266,7 @@ export default function LoginPage() {
                   placeholder="Min. 6 ký tự"
                 />
               </div>
-               <div className="flex flex-col space-y-1.5">
+              <div className="flex flex-col space-y-1.5">
                 <label className="text-[14px] font-medium text-[#1E2A3A]">Xác nhận mật khẩu</label>
                 <input
                   type="password"
@@ -279,10 +277,10 @@ export default function LoginPage() {
                   placeholder="Nhập lại mật khẩu"
                 />
               </div>
-              <button 
-                 type="submit" 
-                 disabled={isLoading}
-                 className={`w-full text-white mt-4 py-2.5 rounded-[10px] font-medium text-[14px] transition-colors ${isLoading ? 'bg-[#9CA3AF] cursor-not-allowed' : 'bg-[#1E2A3A] hover:bg-[#0f172a]'}`}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`w-full text-white mt-4 py-2.5 rounded-[10px] font-medium text-[14px] transition-colors ${isLoading ? 'bg-[#9CA3AF] cursor-not-allowed' : 'bg-[#1E2A3A] hover:bg-[#0f172a]'}`}
               >
                 {isLoading ? 'Đang khởi tạo...' : 'Đăng ký tài khoản'}
               </button>
@@ -306,14 +304,14 @@ export default function LoginPage() {
                   placeholder="you@company.com"
                 />
               </div>
-              <button 
-                 type="submit" 
-                 disabled={isLoading}
-                 className={`w-full text-white mt-2 py-2.5 rounded-[10px] font-medium text-[14px] transition-colors ${isLoading ? 'bg-[#9CA3AF] cursor-not-allowed' : 'bg-[#00b24e] hover:bg-[#009440]'}`}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`w-full text-white mt-2 py-2.5 rounded-[10px] font-medium text-[14px] transition-colors ${isLoading ? 'bg-[#9CA3AF] cursor-not-allowed' : 'bg-[#00b24e] hover:bg-[#009440]'}`}
               >
                 {isLoading ? 'Đang gửi...' : 'Gửi yêu cầu Khôi phục'}
               </button>
-              
+
               <button type="button" onClick={() => setActiveTab("login")} className="text-[13px] text-[#5A6E85] hover:text-[#1E2A3A] underline text-center mt-2">
                 Quay lại đăng nhập
               </button>
