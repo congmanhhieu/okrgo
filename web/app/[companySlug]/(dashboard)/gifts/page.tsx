@@ -34,8 +34,8 @@ export default function GiftsPage() {
 
   const fetchProfile = async () => {
     try {
-      const res = await api.get(`/workspaces/${slug}/users/me`);
-      setStarsBalance(res.data?.stars_balance || 0);
+      const res = await api.get(`/workspaces/${slug}/profile`);
+      setStarsBalance(res?.stars_balance || 0);
     } catch { }
   };
 

@@ -143,7 +143,7 @@ export default function Sidebar() {
 
       <nav className="flex-1 px-4 space-y-1.5 overflow-y-auto mt-2">
         {navItems.filter(item => !item.adminOnly || isAdmin).map(item => {
-          const isActive = pathname.startsWith(item.href);
+          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
           const Icon = item.icon;
           return (
             <a
