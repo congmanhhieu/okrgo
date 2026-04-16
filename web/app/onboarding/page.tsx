@@ -26,12 +26,10 @@ type Invitation = {
   created_at: string;
 };
 
-type ViewMode = "loading" | "select" | "create";
-
 export default function OnboardingPage() {
   const router = useRouter();
   
-  const [viewMode, setViewMode] = useState<ViewMode>("loading");
+  const [loading, setLoading] = useState(true);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   
   const [name, setName] = useState("");
@@ -65,18 +63,14 @@ export default function OnboardingPage() {
       
       if (res.ok) {
         const data = await res.json();
-        if (data && data.length > 0) {
+        if (data) {
           setInvitations(data);
-          setViewMode("select");
-        } else {
-          setViewMode("create");
         }
-      } else {
-        setViewMode("create");
       }
     } catch (e) {
       console.error(e);
-      setViewMode("create");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -138,10 +132,10 @@ export default function OnboardingPage() {
     router.push("/login");
   };
 
-  if (viewMode === "loading") {
+  if (loading) {
     return (
       <div className="flex min-h-[100dvh] items-center justify-center bg-[#F5F7FA]">
-        <div className="text-[14px] font-medium text-[#5A6E85] animate-pulse">Đang kiểm tra lời mời...</div>
+        <div className="text-[14px] font-medium text-[#5A6E85] animate-pulse">Đang nạp dữ liệu...</div>
       </div>
     );
   }
@@ -152,62 +146,51 @@ export default function OnboardingPage() {
         
         <div className="text-center mb-8">
           <h1 className="text-[28px] font-bold text-[#1E2A3A] tracking-tight">OKRgo</h1>
-          <p className="text-[14px] text-[#5A6E85] mt-2">Định vị Không gian làm việc của bạn</p>
+          <p className="text-[14px] text-[#ef4444] mt-2 font-medium bg-red-50 py-2 px-4 rounded-[8px] inline-block">
+            Bạn phải tham gia công ty/tổ chức để sử dụng các chức năng
+          </p>
         </div>
 
-        {/* --- Màn hình Lựa chọn --- */}
-        {viewMode === "select" && (
-          <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
-            <h2 className="text-[18px] font-semibold text-[#1E2A3A]">Bạn đang có {invitations.length} lời mời:</h2>
-            <div className="space-y-3">
-              {invitations.map(inv => (
-                <div key={inv.id} className="flex items-center justify-between bg-[#F9FBFD] p-4 border border-[#E2E8F0] rounded-[10px]">
-                  <div>
-                    <h4 className="text-[15px] font-semibold text-[#1E2A3A]">{inv.name}</h4>
-                    <p className="text-[13px] text-[#9CA3AF]">Mời bạn với vai trò: {inv.role}</p>
+        <div className="space-y-8 animate-in fade-in zoom-in-95 duration-300">
+          
+          {/* Box 1: Lời mời */}
+          <div>
+            <h2 className="text-[16px] font-semibold text-[#1E2A3A] mb-3">Lời mời tham gia công ty ({invitations.length}):</h2>
+            {invitations.length > 0 ? (
+              <div className="space-y-3">
+                {invitations.map(inv => (
+                  <div key={inv.id} className="flex items-center justify-between bg-[#F9FBFD] p-4 border border-[#E2E8F0] rounded-[10px]">
+                    <div>
+                      <h4 className="text-[15px] font-semibold text-[#1E2A3A]">{inv.name}</h4>
+                      <p className="text-[13px] text-[#9CA3AF]">Mời bạn với vai trò: <span className="font-medium text-[#1E2A3A]">{inv.role}</span></p>
+                    </div>
+                    <button
+                      onClick={() => handleAcceptInvite(inv)}
+                      disabled={acceptingId === inv.id}
+                      className="px-5 py-2 bg-[#00b24e] hover:bg-[#009b43] text-white text-[13px] font-medium rounded-[8px] transition-colors shadow-sm disabled:bg-[#9CA3AF]"
+                    >
+                      {acceptingId === inv.id ? 'Đang vào...' : 'Tham gia'}
+                    </button>
                   </div>
-                  <button
-                    onClick={() => handleAcceptInvite(inv)}
-                    disabled={acceptingId === inv.id}
-                    className="px-5 py-2 bg-[#00b24e] hover:bg-[#009b43] text-white text-[13px] font-medium rounded-[8px] transition-colors shadow-sm"
-                  >
-                    {acceptingId === inv.id ? 'Đang vào...' : 'Tham gia'}
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            <div className="relative flex items-center py-4">
-              <div className="flex-grow border-t border-[#E2E8F0]"></div>
-              <span className="flex-shrink-0 mx-4 text-[#9CA3AF] text-[13px] font-medium">HOẶC LÀ</span>
-              <div className="flex-grow border-t border-[#E2E8F0]"></div>
-            </div>
-
-            <button 
-              onClick={() => setViewMode("create")}
-              className="w-full bg-white border border-[#1E2A3A] text-[#1E2A3A] hover:bg-[#F9FBFD] py-3 rounded-[10px] font-semibold text-[14px] transition-colors"
-            >
-              Tự khởi tạo Công ty mới
-            </button>
+                ))}
+              </div>
+            ) : (
+              <div className="text-[14px] text-[#5A6E85] bg-[#F9FBFD] p-4 rounded-[10px] text-center border border-[#E2E8F0]">
+                Hiện tại không có lời mời tham gia tổ chức nào dành cho Email này.
+              </div>
+            )}
           </div>
-        )}
 
-        {/* --- Màn hình Khởi tạo Mới --- */}
-        {viewMode === "create" && (
-          <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
-            <div className="flex justify-between items-center mb-2">
-              <h2 className="text-[18px] font-semibold text-[#1E2A3A]">Tạo vùng làm việc mới</h2>
-              {invitations.length > 0 && (
-                <button 
-                  onClick={() => setViewMode("select")}
-                  className="text-[13px] text-[#00b24e] font-medium hover:underline"
-                >
-                  Quay lại Lời mời
-                </button>
-              )}
-            </div>
+          <div className="relative flex items-center">
+            <div className="flex-grow border-t border-[#E2E8F0]"></div>
+            <span className="flex-shrink-0 mx-4 text-[#9CA3AF] text-[13px] font-medium">HOẶC LÀ</span>
+            <div className="flex-grow border-t border-[#E2E8F0]"></div>
+          </div>
 
-            <form onSubmit={handleCreate} className="flex flex-col space-y-5">
+          {/* Box 2: Tạo công ty */}
+          <div>
+            <h2 className="text-[16px] font-semibold text-[#1E2A3A] mb-3">Khởi tạo một Công ty/Tổ chức mới:</h2>
+            <form onSubmit={handleCreate} className="flex flex-col space-y-4">
               <div className="flex flex-col space-y-1.5">
                 <label className="text-[14px] font-medium text-[#1E2A3A]">Tên tổ chức (hoặc Đội nhóm)</label>
                 <input
@@ -242,19 +225,20 @@ export default function OnboardingPage() {
                 disabled={isCreating || !slug}
                 className={`w-full text-white py-3 rounded-[10px] font-semibold text-[14px] transition-colors mt-2 ${isCreating ? 'bg-[#9CA3AF] cursor-not-allowed' : 'bg-[#1E2A3A] hover:bg-[#0f172a]'}`}
               >
-                {isCreating ? 'Đang tạo...' : 'Xác nhận tạo mới'}
+                {isCreating ? 'Đang tạo...' : 'Tạo Công ty mới'}
               </button>
             </form>
           </div>
-        )}
 
-        {/* Nút đăng xuất (Cần thiết khi họ bị kẹt ở bước này) */}
-        <div className="mt-8 text-center">
+        </div>
+
+        {/* Nút đăng xuất */}
+        <div className="mt-8 text-center pt-6 border-t border-[#F0F2F5]">
           <button 
             onClick={logout}
-            className="text-[13px] text-[#9CA3AF] hover:text-[#5A6E85] transition-colors"
+            className="text-[13px] text-[#9CA3AF] hover:text-[#ef4444] transition-colors font-medium underline"
           >
-            Đăng xuất khỏi tài khoản
+            Đăng xuất tài khoản hiện tại
           </button>
         </div>
 

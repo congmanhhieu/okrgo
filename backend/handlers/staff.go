@@ -12,7 +12,6 @@ import (
 
 	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 )
 
 // GetStaffList returns paginated list of staff in the company
@@ -170,27 +169,8 @@ func CreateStaff(c *gin.Context) {
 	err = tx.QueryRow(ctx, "SELECT id FROM users WHERE email = $1", req.Email).Scan(&existingUserID)
 
 	if err != nil {
-		// User doesn't exist, create new user with temp password
-		tempPassword := "OKRgo@2024"
-		hashedPassword, hashErr := bcrypt.GenerateFromPassword([]byte(tempPassword), bcrypt.DefaultCost)
-		if hashErr != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi tạo tài khoản"})
-			return
-		}
-
-		phone := ""
-		if req.Phone != nil {
-			phone = *req.Phone
-		}
-
-		err = tx.QueryRow(ctx,
-			"INSERT INTO users (name, email, phone, password_hash) VALUES ($1, $2, $3, $4) RETURNING id",
-			req.Name, req.Email, phone, string(hashedPassword),
-		).Scan(&existingUserID)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Không thể tạo tài khoản người dùng", "details": err.Error()})
-			return
-		}
+		c.JSON(http.StatusNotFound, gin.H{"error": "Tài khoản nhân sự chưa được đăng ký trên hệ thống. Yêu cầu nhân sự tạo tài khoản theo Email này trước."})
+		return
 	}
 
 	// Check if already a member
