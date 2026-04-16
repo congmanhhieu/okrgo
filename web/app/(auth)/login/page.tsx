@@ -75,11 +75,13 @@ export default function LoginPage() {
       }
 
       if (activeTab === "register") {
-        toast.success("Đăng ký thành công! Đang đăng nhập...");
-      } else {
-        toast.success("Đăng nhập thành công!");
+        toast.success("Đăng ký thành công! Hãy điền lại thông tin để đăng nhập.");
+        setActiveTab("login");
+        setIsLoading(false);
+        return;
       }
       
+      toast.success("Đăng nhập thành công!");
       localStorage.setItem("okrgo_token", data.token);
 
       // Check Workspaces logic
